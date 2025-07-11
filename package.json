@@ -1,0 +1,11 @@
+{
+  "name": "chai_aur_backend",
+  "version": "1.0.0",
+  "description": "this code doing with chai and code channel",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ariful",
+  "license": "ISC"
+}
