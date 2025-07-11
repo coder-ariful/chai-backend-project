@@ -1,10 +1,25 @@
-import mongoose from "mongoose";
-import { DB_NAME } from "./constants";
+// require ('dotenv').config()
+// require('dotenv').config({path : './env'})
 
+import dotenv from 'dotenv'
+import connectDB from "./DB/index.js";
 // efi function && efi start with commonly ";"   
 // ()()
 
+// dotenv.config({path : './.env'})
+dotenv.config()
 
+connectDB()
+
+
+
+
+
+
+
+
+
+/*
 import express from "express"
 const app = express()
 
@@ -25,3 +40,5 @@ try {
     throw error
 }
 })()
+
+*/
