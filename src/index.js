@@ -3,6 +3,7 @@
 
 import dotenv from 'dotenv'
 import connectDB from "./DB/index.js";
+import { app } from './app.js';
 // efi function && efi start with commonly ";"   
 // ()()
 
@@ -10,7 +11,20 @@ import connectDB from "./DB/index.js";
 dotenv.config()
 
 connectDB()
-
+.then(()=>{
+    app.on("error", (error)=>{
+        console.log('After DB connection there is App create problem or Error', error);
+        throw error
+    })
+    
+    app.listen(process.env.PORT || 8000,()=>{
+        console.log(`Server is Running at : http://localhost:${process.env.PORT}`);
+    })
+})
+.catch(error => {
+    console.log("error in index connect : ", error);
+    
+})
 
 
 
