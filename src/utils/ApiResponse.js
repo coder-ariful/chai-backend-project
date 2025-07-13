@@ -10,3 +10,5 @@ class ApiResponse {
             this.error = statusCode < 400
     }
 }
+
+export { ApiResponse }
