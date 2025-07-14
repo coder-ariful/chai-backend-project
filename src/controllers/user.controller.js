@@ -32,7 +32,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     // 3.
-    const existedUser = User.findOne(
+    const existedUser = await User.findOne(
         { $or: [{ username }, { email }] }
     )
     if (existedUser) {
@@ -40,8 +40,8 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     // 4.
-    const avatarLocalPath = body.files?.avatar[0]?.path;  // multer give us the files || 'avatar' this write because we give this 'name' in middlewares. || local path because this image file not upload in cloudinary. It have in our server
-    const coverImageLocalPath = body.files?.coverImage[0]?.path
+    const avatarLocalPath = req.files?.avatar[0]?.path;  // multer give us the files || 'avatar' this write because we give this 'name' in middlewares. || local path because this image file not upload in cloudinary. It have in our server
+    const coverImageLocalPath = req.files?.coverImage[0]?.path
     // 4.5 .
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar Image is Require")
@@ -50,6 +50,7 @@ const registerUser = asyncHandler(async (req, res) => {
     // 5. 
     const avatar = await uploadOnCloudinary(avatarLocalPath);
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+    console.log('avatar is here :', avatar);
     if (!avatar) {
         throw new ApiError(400, "there is problem in uploading image in cloudinary")
     }
@@ -75,7 +76,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     // 9.
-    return res.status(201).json( new ApiResponse(200,createdUser,"User Successfully Created") )
+    return res.status(201).json(new ApiResponse(200, createdUser, "User Successfully Created"))
 
 })
 
