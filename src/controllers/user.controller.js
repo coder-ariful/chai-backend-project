@@ -41,7 +41,13 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // 4.
     const avatarLocalPath = req.files?.avatar[0]?.path;  // multer give us the files || 'avatar' this write because we give this 'name' in middlewares. || local path because this image file not upload in cloudinary. It have in our server
-    const coverImageLocalPath = req.files?.coverImage[0]?.path
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path
+
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0 ) {
+        coverImageLocalPath = req.files.coverImage[0].path
+    }
+
     // 4.5 .
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar Image is Require")
