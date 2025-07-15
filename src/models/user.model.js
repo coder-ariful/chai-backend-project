@@ -47,6 +47,7 @@ const userSchema = new Schema({
 }, { timestamps: true });
 
 // userSchema.pre("save",()=> {})  // this function is wrong because "we need to use 'this' word!!!!"
+// this function will run when ( Just before Save or anything update.)
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
 

@@ -263,4 +263,134 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 })
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken }
+const changeCurrentUserPassword = asyncHandler(async (req, res) => {
+    // 1. get data from Client => Old_Password, New_Password, or Confirm_Password
+    // 2. find User from User_DataBase 
+    // 3. match the Old_Password and check the validation.
+    // 4. set New_Password in password box Within MongoDB or (DataBase)
+    // 5. save the new_Password 
+    // 6. send the response in return.
+
+
+    // 1.
+    const { oldPassword, newPassword } = req.body;
+    // 2.
+    const user = await User.findById(req.body?._id)
+    // 3. 
+    const passwordValidation = await user.isPasswordCorrect(oldPassword);
+    if (!passwordValidation) {
+        throw new ApiError(401, "Your Old password is not Matched." || "Invalid Old Password")
+    }
+    // 4.
+    user.password = newPassword;
+    // 5.
+    await user.save({ validateBeforeSave: false })
+    // 6.
+    return res
+        .status(201)
+        .json(new ApiResponse(201, {}, "Password changed successfully."))
+})
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+    return res
+        .status(200)
+        .json(new ApiResponse(200, req.user, "current user fetched successfully"))
+})
+
+const updateAccountDetails = asyncHandler(async (req, res) => {
+    const { fullName, email } = req.body;
+    if (!fullName || !email) {
+        throw new ApiError(401, "fullName and email fields are required.")
+    }
+    const user = await User.findByIdAndUpdate(
+        req.body?._id,
+        {
+            $set: {
+                fullName,
+                email: email
+            }
+        },
+        { new: true } // after update save and show the updated one.
+    ).select("-password")
+
+    return res
+        .status(201)
+        .json(new ApiResponse(201, user, "Account Details updated successfully."))
+})
+
+const updateUserAvatar = asyncHandler(async (req, res) => {
+    // 1. get image of file path form locally.
+    // 2. check is there have any error or not.
+    // 3. then send the local file to cloudinary to became online. (Always use await)
+    // 4. then check is server give us the Cloudinary_Image_URL 
+    // 5. update in DataBase.
+
+    // 1.
+    const avatarLocalPath = req.file?.path; // req.file or req.files we have from multer or multer_middleware
+    // 2.
+    if (!avatarLocalPath) {
+        throw new ApiError(401, "there is an error in updating file or avatar.")
+    }
+    // 3.
+    const avatar = await uploadOnCloudinary(avatarLocalPath); // this give us a image url
+    // 4.
+    if (!avatar.url) {
+        throw new ApiError(401, "Error while updating avatar. and avatar image is missing")
+    }
+
+
+    // 5.
+    const user = await User.findByIdAndUpdate(
+        req.user?._id, // this get from auth.middleware.js to jwtVerify middleware.
+        {
+            $set: {
+                avatar: avatar.url
+            }
+        },
+        { new: true }
+    ).select("-password")
+
+    return res
+        .status(201)
+        .json(new ApiResponse(201, user, "Avatar updated successfully."))
+
+})
+const updateUserCoverImage = asyncHandler(async (req, res) => {
+    // 1. get image of file path form locally.
+    // 2. check is there have any error or not.
+    // 3. then send the local file to cloudinary to became online. (Always use await)
+    // 4. then check is server give us the Cloudinary_Image_URL 
+    // 5. update in DataBase.
+
+    // 1.
+    const coverImageLocalPath = req.file?.path; // req.file or req.files we have from multer or multer_middleware
+    // 2.
+    if (!coverImageLocalPath) {
+        throw new ApiError(401, "there is an error in updating file or cover Image is missing.")
+    }
+    // 3.
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath); // this give us a image url
+    // 4.
+    if (!coverImage.url) {
+        throw new ApiError(401, "Error while updating coverImage image.")
+    }
+
+
+    // 5.
+    const user = await User.findByIdAndUpdate(
+        req.user?._id, // this get from auth.middleware.js to jwtVerify middleware.
+        {
+            $set: {
+                coverImage: coverImage.url
+            }
+        },
+        { new: true }
+    ).select("-password")
+
+    return res
+        .status(201)
+        .json(new ApiResponse(201, user, "cover image updated successfully."))
+
+})
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentUserPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage }
