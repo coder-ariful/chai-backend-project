@@ -1,3 +1,5 @@
+// this middleware work is only see => add photo file or anything else (add to file storage)
+
 import multer from "multer";
 
 const storage = multer.diskStorage(
