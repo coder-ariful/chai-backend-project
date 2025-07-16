@@ -189,8 +189,8 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            $: {
+                refreshToken: 1 // this removes the field from document
             }
         },
         {
@@ -306,7 +306,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         throw new ApiError(401, "fullName and email fields are required.")
     }
 
-    console.log(fullName, email);
+
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
