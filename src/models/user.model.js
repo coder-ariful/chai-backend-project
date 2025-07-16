@@ -39,7 +39,7 @@ const userSchema = new Schema({
     ],
     password: {
         type: String,
-        require: [true, 'Password is required'],
+        require: [true, 'Password is required']
     },
     refreshToken: {
         type: String
@@ -56,7 +56,7 @@ userSchema.pre("save", async function (next) {
 })
 
 // creating a method for checking password is matched or not
-userSchema.methods.isPasswordCorrect = async function(password) {
+userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password)
 }
 

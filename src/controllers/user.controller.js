@@ -129,7 +129,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // 1.
     const { email, username, password } = req.body;
-    // console.log(email);
+    console.log(password);
     // 2.
     if (!email && !username) {
         throw new ApiError(400, "Email or username is required")
@@ -223,6 +223,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
+    console.log(incomingRefreshToken);
     if (!incomingRefreshToken) {
         throw new ApiError(401, 'unauthorized access and your token in not right and not get in coming refresh token.')
     }
@@ -276,7 +277,8 @@ const changeCurrentUserPassword = asyncHandler(async (req, res) => {
     // 1.
     const { oldPassword, newPassword } = req.body;
     // 2.
-    const user = await User.findById(req.body?._id)
+    const user = await User.findById(req.user?._id)
+    console.log(user);
     // 3. 
     const passwordValidation = await user.isPasswordCorrect(oldPassword);
     if (!passwordValidation) {
@@ -303,8 +305,11 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     if (!fullName || !email) {
         throw new ApiError(401, "fullName and email fields are required.")
     }
+
+    console.log(fullName, email);
+
     const user = await User.findByIdAndUpdate(
-        req.body?._id,
+        req.user?._id,
         {
             $set: {
                 fullName,
@@ -313,6 +318,8 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         },
         { new: true } // after update save and show the updated one.
     ).select("-password")
+
+    console.log("there is a error", user);
 
     return res
         .status(201)
@@ -431,8 +438,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                     $size: "$subscribedTo"
                 },
                 isSubscribed: {
-                    $cond:{
-                        if: { $in: [req.user?._id, "$subscribers.subscriber"]},
+                    $cond: {
+                        if: { $in: [req.user?._id, "$subscribers.subscriber"] },
                         then: true,
                         else: false
                     }
@@ -454,13 +461,13 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     ])
     console.log("Here is Channel :", channel);
 
-    if(!channel.length) {
+    if (!channel.length) {
         throw new ApiError(404, "Channel doesn't exist.")
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, channel[0], "User Channel fetched successfully"))
+        .status(200)
+        .json(new ApiResponse(200, channel[0], "User Channel fetched successfully"))
 })
 
 const getWatchHistory = asyncHandler(async (req, res) => {
@@ -498,7 +505,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                         $addFields: {
                             owner: {
                                 $first: "$owner"
-                            } 
+                            }
                         }
                     }
                 ]
@@ -507,8 +514,8 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     ])
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, user[0].watchHistory, "Watch History Fetched Successfully."))
+        .status(200)
+        .json(new ApiResponse(200, user[0].watchHistory, "Watch History Fetched Successfully."))
 })
 
 export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentUserPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannelProfile, getWatchHistory }
